@@ -1,6 +1,8 @@
 /**
  * @file Polynomial.cpp
  * @brief Реализация класса Polynomial.
+ * @author Твоё Имя
+ * @date 14.10.2026
  */
 
 #include "Polynomial.h"
@@ -38,6 +40,52 @@ Polynomial::~Polynomial()
               << b << "x + " << c << "\n";
 }
 
+// ==================== Унарные операции ====================
+
+/**
+ * @brief Префиксный инкремент. Увеличивает все коэффициенты на 1.
+ * @return Ссылка на *this.
+ */
+Polynomial& Polynomial::operator++()
+{
+    ++a; ++b; ++c;
+    return *this;
+}
+
+/**
+ * @brief Постфиксный инкремент.
+ * @param dummy Фиктивный параметр для отличия от префиксной формы.
+ * @return Копия объекта до изменения.
+ */
+Polynomial Polynomial::operator++(int dummy)
+{
+    Polynomial temp(*this);
+    ++(*this);
+    return temp;
+}
+
+/**
+ * @brief Префиксный декремент. Уменьшает все коэффициенты на 1.
+ * @return Ссылка на *this.
+ */
+Polynomial& Polynomial::operator--()
+{
+    --a; --b; --c;
+    return *this;
+}
+
+/**
+ * @brief Постфиксный декремент.
+ * @param dummy Фиктивный параметр.
+ * @return Копия объекта до изменения.
+ */
+Polynomial Polynomial::operator--(int dummy)
+{
+    Polynomial temp(*this);
+    --(*this);
+    return temp;
+}
+
 // ==================== Заглушки ====================
 
 double Polynomial::getA() const { return a; }
@@ -45,11 +93,6 @@ double Polynomial::getB() const { return b; }
 double Polynomial::getC() const { return c; }
 int Polynomial::getRootsCallCount() { return rootsCallCount; }
 double Polynomial::evaluate(double) const { return 0.0; }
-
-Polynomial& Polynomial::operator++() { return *this; }
-Polynomial Polynomial::operator++(int) { return *this; }
-Polynomial& Polynomial::operator--() { return *this; }
-Polynomial Polynomial::operator--(int) { return *this; }
 
 Polynomial& Polynomial::operator+=(const Polynomial&) { return *this; }
 Polynomial& Polynomial::operator-=(const Polynomial&) { return *this; }
