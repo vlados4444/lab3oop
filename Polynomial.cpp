@@ -5,6 +5,7 @@
 
 #include "Polynomial.h"
 #include <stdexcept>
+#include <cmath>
 
 int Polynomial::rootsCallCount = 0;
 
@@ -73,61 +74,86 @@ Polynomial& Polynomial::operator/=(double k)
 
 // ==================== Бинарные операции ====================
 
-/**
- * @brief Сложение двух полиномов.
- * Реализовано через operator+=, как требует задание.
- * @param lhs Левый операнд (копия — чтобы изменить и вернуть).
- * @param rhs Правый операнд.
- * @return Новый полином — сумма lhs и rhs.
- */
-Polynomial operator+(Polynomial lhs, const Polynomial& rhs)
+Polynomial operator+(Polynomial lhs, const Polynomial& rhs) { lhs += rhs; return lhs; }
+Polynomial operator-(Polynomial lhs, const Polynomial& rhs) { lhs -= rhs; return lhs; }
+Polynomial operator*(Polynomial lhs, double k)             { lhs *= k;   return lhs; }
+Polynomial operator/(Polynomial lhs, double k)             { lhs /= k;   return lhs; }
+
+// ==================== Операции сравнения ====================
+
+bool operator<(const Polynomial& l, const Polynomial& r)  { return l.c < r.c; }
+bool operator>(const Polynomial& l, const Polynomial& r)  { return l.c > r.c; }
+bool operator<=(const Polynomial& l, const Polynomial& r) { return l.c <= r.c; }
+bool operator>=(const Polynomial& l, const Polynomial& r) { return l.c >= r.c; }
+
+bool operator==(const Polynomial& l, const Polynomial& r)
 {
-    lhs += rhs;
-    return lhs;
+    return l.a == r.a && l.b == r.b && l.c == r.c;
 }
 
-/**
- * @brief Вычитание двух полиномов через operator-=.
- */
-Polynomial operator-(Polynomial lhs, const Polynomial& rhs)
+bool operator!=(const Polynomial& l, const Polynomial& r)
 {
-    lhs -= rhs;
-    return lhs;
+    return !(l == r);
 }
 
-/**
- * @brief Умножение полинома на число через operator*=.
- */
-Polynomial operator*(Polynomial lhs, double k)
-{
-    lhs *= k;
-    return lhs;
-}
-
-/**
- * @brief Деление полинома на число через operator/=.
- * @throw std::invalid_argument Если k == 0.
- */
-Polynomial operator/(Polynomial lhs, double k)
-{
-    lhs /= k;
-    return lhs;
-}
-
-// ==================== Заглушки ====================
+// ==================== Методы чтения ====================
 
 double Polynomial::getA() const { return a; }
 double Polynomial::getB() const { return b; }
 double Polynomial::getC() const { return c; }
 int Polynomial::getRootsCallCount() { return rootsCallCount; }
-double Polynomial::evaluate(double) const { return 0.0; }
 
-bool operator<(const Polynomial&, const Polynomial&) { return false; }
-bool operator>(const Polynomial&, const Polynomial&) { return false; }
-bool operator<=(const Polynomial&, const Polynomial&) { return false; }
-bool operator>=(const Polynomial&, const Polynomial&) { return false; }
-bool operator==(const Polynomial&, const Polynomial&) { return false; }
-bool operator!=(const Polynomial&, const Polynomial&) { return false; }
+double Polynomial::evaluate(double x) const
+{
+    return a * x * x + b * x + c;
+}
 
-void Polynomial::print() const {}
-void Polynomial::findRoots() const {}
+// ==================== Вывод ====================
+
+void Polynomial::print() const
+{
+    std::cout << a << "x^2 + " << b << "x + " << c << "\n";
+}
+
+// ==================== Поиск корней ====================
+
+void Polynomial::findRoots() const
+{
+    ++rootsCallCount;
+
+    std::cout << "Поиск корней для ";
+    print();
+
+    if (a == 0.0)
+    {
+        if (b == 0.0)
+        {
+            std::cout << (c == 0.0
+                ? "Бесконечно много решений\n"
+                : "Нет решений\n");
+        }
+        else
+        {
+            std::cout << "Линейное уравнение, корень: x = " << -c / b << "\n";
+        }
+        return;
+    }
+
+    double d = b * b - 4 * a * c;
+    std::cout << "Дискриминант D = " << d << "\n";
+
+    if (d > 0)
+    {
+        double x1 = (-b + std::sqrt(d)) / (2 * a);
+        double x2 = (-b - std::sqrt(d)) / (2 * a);
+        std::cout << "Два корня: x1 = " << x1 << ", x2 = " << x2 << "\n";
+    }
+    else if (d == 0)
+    {
+        std::cout << "Один корень: x = " << -b / (2 * a) << "\n";
+    }
+    else
+    {
+        std::cout << "Действительных корней нет (D < 0)\n";
+    }
+}
